@@ -43,9 +43,12 @@ model_name = 'resnet18'
 # model可视化
 x = torch.rand(1, 3, 32, 32)  # 随便定义一个输入
 writer.add_graph(model, x)
+# 模型打印
 summary(model, (3, 32, 32))
 # 加载到GPU
 model.cuda(device)
+
+
 # 损失函数
 criterion = torch.nn.CrossEntropyLoss().cuda(device)
 

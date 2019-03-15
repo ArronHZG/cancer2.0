@@ -12,7 +12,7 @@ from tensorboardX import SummaryWriter
 from torch.optim import optimizer
 from tqdm import tqdm
 
-writer = SummaryWriter('./logs/tensorBoardX/')# {}'.format(time.time()))
+writer = SummaryWriter('./logs/tensorBoardX')# {}'.format(time.time()))
 
 
 class Acc:
