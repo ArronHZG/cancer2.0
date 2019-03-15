@@ -80,7 +80,7 @@ def readImage(path, augmentations=False):
             torchvision.transforms.RandomHorizontalFlip(),
             torchvision.transforms.RandomVerticalFlip(),
             torchvision.transforms.RandomRotation(45),
-            torchvision.transforms.ColorJitter(brightness=0.2, contrast=0.2, hue=0.2),
+            torchvision.transforms.ColorJitter(brightness=0.1, contrast=0.1, hue=0.1),
             torchvision.transforms.RandomCrop(32),
             torchvision.transforms.ToTensor(),
             torchvision.transforms.Normalize(std=(0.23889325, 0.28209431, 0.21625058),
@@ -95,7 +95,7 @@ def readImage(path, augmentations=False):
         ])
     image = Image.fromarray(image.astype('uint8')).convert('RGB')
     image = im_aug(image)
-    image = torch.clamp(image, min=0.0, max=1.0)
+    # image = torch.clamp(image, min=0.0, max=1.0)
     return image
 
 

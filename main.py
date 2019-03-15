@@ -11,19 +11,14 @@ import pandas as pd
 import torch
 from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau, CosineAnnealingLR
 from sklearn.model_selection import train_test_split
-import torchvision
-
 from PCam_data_set import PCam_data_set
-# from models.pnasnet5large import PNASNet5Large
 from models.resnet import resnet18
 from trainer import train_model, writer
-# from torchvision.models import densenet201
 from torchsummary import summary
 
 BATCH_SIZE = 128
 NUM_WORKERS = 8
-device = 1  # torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
-
+device = 1
 # 加载数据
 INPUT_PATH = "/home/arron/文档/notebook/侯正罡/cancer/input"
 csv_url = INPUT_PATH + '/train_labels.csv'
@@ -44,6 +39,39 @@ dataloaders = {'train': train_loader, 'valid': valid_loader}
 # 加载模型
 model = resnet18(num_classes=2, pretrained=False)
 model_name = 'resnet18'
+
+# model可视化
+x = torch.rand(1, 3, 32, 32)  # 随便定义一个输入
+writer.add_graph(model, x)
+summary(model, (3, 32, 32))
+# 加载到GPU
+model.cuda(device)
+# 损失函数
+criterion = torch.nn.CrossEntropyLoss().cuda(device)
+
+# 优化器
+# 使用warm_up
+params_to_update = model.parameters()
+optimizer = torch.optim.ASGD(params_to_update, lr=2e-6, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+scheduler = MultiStepLR(optimizer, [3, 5, 7, 9, 13], gamma=10)
+# 训练和评估
+train_model(model, model_name, dataloaders,
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[0, 15])
+
+optimizer = torch.optim.ASGD(params_to_update, lr=2e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+scheduler = CosineAnnealingLR(optimizer, T_max=10, eta_min=2e-6)
+# 训练和评估
+train_model(model, model_name, dataloaders,
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[15, 25])
+
+optimizer = torch.optim.ASGD(params_to_update, lr=2e-6, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5,
+                              verbose=True, threshold=1e-4, threshold_mode='rel',
+                              cooldown=0, min_lr=0, eps=1e-86)
+# 训练和评估
+train_model(model, model_name, dataloaders,
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[25, 50])
+
 # models = PNASNet5Large(2)
 
 # 开启多个GPU
@@ -55,26 +83,3 @@ model_name = 'resnet18'
 # PATH = '../weight/resnet50-7-Loss-0.7759 Acc-0.5334-models.pth'
 # models.load_state_dict(torch.load(PATH))
 # models.eval()
-
-# model可视化
-
-x = torch.rand(1, 3, 32, 32)  # 随便定义一个输入
-
-writer.add_graph(model, x)
-summary(model, (3, 32, 32))
-# 加载到GPU
-model.cuda(device)
-# 优化器
-params_to_update = model.parameters()
-optimizer = torch.optim.Adam(params_to_update, lr=1e-1, amsgrad=True)
-
-# 使用warm_up和余弦退火
-scheduler = CosineAnnealingLR(optimizer, T_max=5, eta_min=4e-08)
-# scheduler = GradualWarmupScheduler(optimizer, multiplier=8, total_epoch=10,
-#                                    after_scheduler=scheduler_cos)
-# 损失函数
-criterion = torch.nn.CrossEntropyLoss().cuda(device)
-
-# 训练和评估
-train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, num_epochs=120, test_size=test_size)

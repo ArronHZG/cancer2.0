@@ -127,10 +127,12 @@ def valid_epoch(model, data_loaders, device, criterion, model_name, epoch, best_
 
 
 def train_model(model, model_name, data_loaders, criterion, optimizer: optimizer, device, scheduler=None,
-                num_epochs=25, test_size=0.1):
+                test_size=0.1, num_epochs=None):
+    if num_epochs is None:
+        num_epochs = [0, 25]
     best_acc = 0.0
     gap = int((1 - test_size) * 10)
-    for epoch in range(num_epochs):
+    for epoch in range(num_epochs[0],num_epochs[1]):
         # print(f"epoch:{epoch}")
         train_acc, train_loss = train_epoch(model, data_loaders, optimizer, device, criterion, epoch,
                                             scheduler=scheduler)
