@@ -88,6 +88,7 @@ def train_epoch(model, data_loaders, optimizer, device, criterion, epoch, schedu
             pred = model(inputs)
             c_loss = criterion(pred, labels)
             c_loss.backward()
+            optimizer.step()
             loss.update(c_loss.item(), epoch * data_size + i)
             acc.update(pred, labels, epoch * data_size + i)
             i += 1
@@ -99,8 +100,6 @@ def train_epoch(model, data_loaders, optimizer, device, criterion, epoch, schedu
                 scheduler.step(epoch_loss)
             else:
                 scheduler.step()
-        else:
-            optimizer.step()
     return epoch_acc, epoch_loss
 
 
