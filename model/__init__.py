@@ -1,0 +1,3 @@
+# resnet
+# densenet
+# batch normalization
