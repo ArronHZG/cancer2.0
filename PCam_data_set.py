@@ -146,3 +146,5 @@ if __name__ == '__main__':
     #     print(image.dtype)
     #     print(label)
     #     break
+    import torchvision
+    torchvision.models.resnet18()

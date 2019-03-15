@@ -12,6 +12,7 @@ import torch
 from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau, CosineAnnealingLR, StepLR
 from sklearn.model_selection import train_test_split
 from PCam_data_set import PCam_data_set
+from load_paramter import load_parameter
 from models.resnet import resnet18
 from trainer import train_model, writer
 from torchsummary import summary
@@ -39,7 +40,8 @@ dataloaders = {'train': train_loader, 'valid': valid_loader}
 # 加载模型
 model = resnet18(num_classes=2, pretrained=False)
 model_name = 'resnet18'
-
+# 模型参数加载
+model = load_parameter(model,model_name)
 # model可视化
 x = torch.rand(1, 3, 32, 32)  # 随便定义一个输入
 writer.add_graph(model, x)
