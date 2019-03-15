@@ -55,11 +55,11 @@ model.cuda(device)
 criterion = torch.nn.CrossEntropyLoss().cuda(device)
 
 # 训练
-optimizer = torch.optim.ASGD(model.parameters(), lr=2e-1, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+optimizer = torch.optim.ASGD(model.parameters(), lr=2e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
 train_model(model, model_name, dataloaders,
             criterion, optimizer, device, test_size=test_size, num_epochs=[0, 20])
 
-optimizer = torch.optim.ASGD(model.parameters(), lr=2e-1, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+optimizer = torch.optim.ASGD(model.parameters(), lr=2e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
 scheduler = CosineAnnealingLR(optimizer, T_max=8, eta_min=2e-6)
 train_model(model, model_name, dataloaders,
             criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[20, 36])
