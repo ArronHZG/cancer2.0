@@ -55,6 +55,7 @@ def readImagFromPath(path):
     # OpenCV reads the image in bgr format by default
     bgr_img = cv2.imread(path)
     # # We flip it to rgb for visualization purposes
+    # print(path)
     return cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
 
 
