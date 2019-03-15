@@ -122,7 +122,7 @@ def valid_epoch(model, data_loaders, device, criterion, model_name, epoch, best_
     epoch_acc = acc.get()
     if epoch_acc > best_acc:
         best_model_wts = copy.deepcopy(model.state_dict())
-        local_PATH = './models_weight/My-{}-{}-Loss-{:.4f}-Acc-{:.4f}-models.pth' \
+        local_PATH = './models_weight/{}-{}-Loss-{:.4f}-Acc-{:.4f}-models.pth' \
             .format(model_name, epoch, epoch_loss, epoch_acc)
         torch.save(best_model_wts, local_PATH)
         print(f"save{local_PATH}")
