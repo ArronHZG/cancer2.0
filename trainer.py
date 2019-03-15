@@ -6,13 +6,13 @@
 # 特征降维：add_embedding
 # 输出结果混淆矩阵：混淆矩阵
 import torch
-import time
+from time import time
 import copy
 from tensorboardX import SummaryWriter
 from torch.optim import optimizer
 from tqdm import tqdm
 
-writer = SummaryWriter('./logs/tensorBoardX')# {}'.format(time.time()))
+writer = SummaryWriter('./logs/tensorBoardX')  # {}'.format(time.time()))
 
 
 class Acc:
@@ -88,16 +88,19 @@ def train_epoch(model, data_loaders, optimizer, device, criterion, epoch, schedu
             pred = model(inputs)
             c_loss = criterion(pred, labels)
             c_loss.backward()
-            if scheduler:
-                scheduler.step()
-            else:
-                optimizer.step()
             loss.update(c_loss.item(), epoch * data_size + i)
             acc.update(pred, labels, epoch * data_size + i)
             i += 1
             writer.add_scalar("learningRate", optimizer.param_groups[0]['lr'], epoch * data_size + i)
         epoch_loss = loss.get()
         epoch_acc = acc.get()
+        if scheduler:
+            if type(scheduler) == torch.optim.lr_scheduler.ReduceLROnPlateau:
+                scheduler.step(epoch_loss)
+            else:
+                scheduler.step()
+        else:
+            optimizer.step()
     return epoch_acc, epoch_loss
 
 
@@ -132,17 +135,17 @@ def train_model(model, model_name, data_loaders, criterion, optimizer: optimizer
         num_epochs = [0, 25]
     best_acc = 0.0
     gap = int((1 - test_size) * 10)
-    for epoch in range(num_epochs[0],num_epochs[1]):
+    for epoch in range(num_epochs[0], num_epochs[1]):
         # print(f"epoch:{epoch}")
-        train_acc, train_loss = train_epoch(model, data_loaders, optimizer, device, criterion, epoch,
-                                            scheduler=scheduler)
-        valid_acc, valid_loss = valid_epoch(model, data_loaders, device, criterion, model_name, epoch, best_acc, gap)
+        start_time=time()
+        train_acc, train_loss = train_epoch(model, data_loaders, optimizer, device, criterion,
+                                            epoch,scheduler=scheduler)
+        valid_acc, valid_loss = valid_epoch(model, data_loaders, device, criterion, model_name,
+                                            epoch, best_acc, gap)
+        time_elapsed=time()-start_time
+        last_time="{:.0f}m {:.0f}s".format(time_elapsed // 60, time_elapsed % 60)
         if valid_acc > best_acc:
             best_acc = valid_acc
-        scalar_acc = {"train_acc": train_acc, "valid_acc": valid_acc}
-        scalar_loss = {"train_loss": valid_loss, "valid_loss": valid_loss}
-        # print(scalar_acc)
-        # print(scalar_loss)
-        # scalar_show(scalar_acc, scalar_loss)
-        print("epoch:{:4}--train_acc:{:4f}--valid_acc:{:4f}--train_loss:{:4f}--valid_loss:{:4f}"
-              .format(epoch, train_acc, valid_acc, train_loss, valid_loss))
+
+        print("epoch:{:4}--train_acc:{:4f}--valid_acc:{:4f}--train_loss:{:4f}--valid_loss:{:4f}--time:{}"
+              .format(epoch, train_acc, valid_acc, train_loss, valid_loss, last_time))
