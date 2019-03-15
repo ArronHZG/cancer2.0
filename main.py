@@ -9,7 +9,7 @@
 # CosineAnnealingLR
 import pandas as pd
 import torch
-from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau, CosineAnnealingLR
+from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau, CosineAnnealingLR, StepLR
 from sklearn.model_selection import train_test_split
 from PCam_data_set import PCam_data_set
 from models.resnet import resnet18
@@ -54,26 +54,25 @@ criterion = torch.nn.CrossEntropyLoss().cuda(device)
 
 # 优化器
 # 使用warm_up
-params_to_update = model.parameters()
-optimizer = torch.optim.ASGD(params_to_update, lr=2e-6, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
-scheduler = MultiStepLR(optimizer, [3, 5, 7, 9, 13], gamma=10)
+optimizer = torch.optim.ASGD(model.parameters(), lr=2e-6, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+scheduler = StepLR(optimizer, 1, gamma=2)
 # 训练和评估
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[0, 15])
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[0, 10])
 
-optimizer = torch.optim.ASGD(params_to_update, lr=2e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
-scheduler = CosineAnnealingLR(optimizer, T_max=10, eta_min=2e-6)
+optimizer = torch.optim.ASGD(model.parameters(), lr=2e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+scheduler = CosineAnnealingLR(optimizer, T_max=8, eta_min=2e-6)
 # 训练和评估
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[15, 25])
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[10, 42])
 
-optimizer = torch.optim.ASGD(params_to_update, lr=2e-6, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+optimizer = torch.optim.Adam(model.parameters(),lr=2e-2, betas=(0.9, 0.999), eps=1e-8,weight_decay=1e-6, amsgrad=True)
 scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5,
                               verbose=True, threshold=1e-4, threshold_mode='rel',
                               cooldown=0, min_lr=0, eps=1e-86)
 # 训练和评估
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[25, 50])
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[42, 70])
 
 # models = PNASNet5Large(2)
 
