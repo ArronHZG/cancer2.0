@@ -64,13 +64,13 @@ class LearningRate:
         self.LR_hist = []
 
 
-def scalar_show(acc=None, loss=None, **kwargs):
-    if acc:
-        writer.add_scalars("acc", acc)
-    if loss:
-        writer.add_scalars("loss", loss)
-    for key, item in kwargs:
-        writer.add_scalar(key, item)
+# def scalar_show(acc=None, loss=None, **kwargs):
+#     if acc:
+#         writer.add_scalars("acc", acc)
+#     if loss:
+#         writer.add_scalars("loss", loss)
+#     for key, item in kwargs:
+#         writer.add_scalar(key, item)
 
 
 def train_epoch(model, data_loaders, optimizer, device, criterion, epoch, scheduler=None):
@@ -81,7 +81,7 @@ def train_epoch(model, data_loaders, optimizer, device, criterion, epoch, schedu
     i = 0
 
     with torch.set_grad_enabled(True):
-        for inputs, labels in tqdm(data_loaders["train"]):
+        for inputs, labels in data_loaders["train"]:
             optimizer.zero_grad()
             inputs = inputs.cuda(device)
             labels = labels.cuda(device)
@@ -110,7 +110,7 @@ def valid_epoch(model, data_loaders, device, criterion, model_name, epoch, best_
     model.eval()
     data_size = len(data_loaders["valid"])
     i = 0
-    for inputs, labels in tqdm(data_loaders["valid"]):
+    for inputs, labels in data_loaders["valid"]:
         inputs = inputs.cuda(device)
         labels = labels.cuda(device)
         pred = model(inputs)
