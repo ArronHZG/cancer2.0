@@ -83,15 +83,15 @@ def readImage(path, augmentations=False):
             torchvision.transforms.ColorJitter(brightness=0.01, contrast=0.01, hue=0.01),
             torchvision.transforms.RandomCrop(32),
             torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(std=(0.23889325, 0.28209431, 0.21625058),
-                                             mean=(0.70244707, 0.54624322, 0.69645334))
+            # torchvision.transforms.Normalize(std=(0.23889325, 0.28209431, 0.21625058),
+            #                                  mean=(0.70244707, 0.54624322, 0.69645334))
 
         ])
     else:
         image = image[32:64, 32:64, :]
         im_aug = torchvision.transforms.Compose([
             torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(std=(0.5, 0.5, 0.5), mean=(0.5, 0.5, 0.5))
+            # torchvision.transforms.Normalize(std=(0.5, 0.5, 0.5), mean=(0.5, 0.5, 0.5))
         ])
     image = Image.fromarray(image.astype('uint8')).convert('RGB')
     image = im_aug(image)
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     import torchvision
 
     path = "input/train/test_img.tif"
-    image = readImage(path, augmentations=True)
+    image = readImage(path, augmentations=False)
     batch_tensor = [readImage(path, augmentations=True) for x in range(81)]
     # print(batch_tensor)
     # print(np.array(image).shape)
@@ -146,5 +146,3 @@ if __name__ == '__main__':
     #     print(image.dtype)
     #     print(label)
     #     break
-    import torchvision
-    torchvision.models.resnet18()
