@@ -22,7 +22,7 @@ from PIL import Image
 
 
 def noramlize(train_path, shuffled_data):
-    import tqdm
+    from tqdm import tqdm
     import numpy as np
     # As we count the statistics, we can check if there are any completely black or white images
     dark_th = 10 / 255  # If no pixel reaches this threshold, image is considered too dark
@@ -64,8 +64,35 @@ def preTreat(image):
     return image
 
 
-def croppedImage(image):
-    return image
+def strong_aug(p=.5):
+    return A.Compose([
+        A.RandomRotate90(),
+        A.Flip(),
+#         Transpose(),
+        A.OneOf([
+            A.IAAAdditiveGaussianNoise(),
+            A.GaussNoise(),
+        ], p=0.2),
+        A.OneOf([
+            A.MotionBlur(p=.2),
+            A.MedianBlur(blur_limit=3, p=0.1),
+            A.Blur(blur_limit=3, p=0.1),
+        ], p=0.2),
+        A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=0.2),
+        A.OneOf([
+            A.OpticalDistortion(p=0.3),
+            A.GridDistortion(p=.1),
+            A.IAAPiecewiseAffine(p=0.3),
+        ], p=0.2),
+        A.OneOf([
+            A.CLAHE(clip_limit=2),
+            A.IAASharpen(),
+            A.IAAEmboss(),
+            A.RandomBrightnessContrast(),
+        ], p=0.3),
+        A.HueSaturationValue(p=0.3),
+    ], p=p)
+
 
 
 def readImage(path, augmentations=False):
@@ -74,46 +101,12 @@ def readImage(path, augmentations=False):
     # 数据预处理
     image = preTreat(image)
     if augmentations:
-        # # 数据增强
-        # im_aug = torchvision.transforms.Compose([
-        #     torchvision.transforms.RandomHorizontalFlip(),
-        #     torchvision.transforms.RandomVerticalFlip(),
-        #     torchvision.transforms.ColorJitter(brightness=0.01, contrast=0.01, hue=0.01),
-        #     torchvision.transforms.RandomCrop(32),
-        #     torchvision.transforms.ToTensor(),
-        #     # torchvision.transforms.Normalize(std=(0.23889325, 0.28209431, 0.21625058),
-        #     #                                  mean=(0.70244707, 0.54624322, 0.69645334))
-        #
-        # ])
-        #
-        # image = Image.fromarray(image.astype('uint8')).convert('RGB')
-        # image = torchvision.transforms.RandomRotation(45)(image)
-        # image = torchvision.transforms.ToTensor()(image)
-        # image = image[:, 24:72, 24:72].permute(1, 2, 0)  # 中心48中裁剪32
-        # print(image.size())
-        # image = Image.fromarray(image.numpy()).convert('RGB')
-        # image = im_aug(image)
-
-        im_aug = torchvision.transforms.Compose([
-            torchvision.transforms.ToTensor(),
-            # torchvision.transforms.Normalize(std=(0.5, 0.5, 0.5), mean=(0.5, 0.5, 0.5))
-        ])
-        # print(image)
-        # image = image[32:64, 32:64, :]
-        image = Image.fromarray(image.astype('uint8')).convert('RGB')
-        image = im_aug(image)
-
-
-    else:
-        im_aug = torchvision.transforms.Compose([
-            torchvision.transforms.ToTensor(),
-            # torchvision.transforms.Normalize(std=(0.5, 0.5, 0.5), mean=(0.5, 0.5, 0.5))
-        ])
-        # print(image)
-        # image = image[32:64, 32:64, :]
-        image = Image.fromarray(image.astype('uint8')).convert('RGB')
-        image = im_aug(image)
-    # image = torch.clamp(image, min=0.0, max=1.0)
+        # std=(0.23889325, 0.28209431, 0.21625058),
+        # mean=(0.70244707, 0.54624322, 0.69645334))
+        image = strong_aug(p=1)(image=image)["image"]
+    image = A.Normalize(mean=(0.70244707, 0.54624322, 0.69645334),std=(0.23889325, 0.28209431, 0.21625058))(image = image)["image"]
+    image=torch.from_numpy(image)
+    image=image.permute(2,0,1)
     return image
 
 
@@ -142,28 +135,11 @@ if __name__ == '__main__':
 
     path = "input/train/test_img.tif"
     image = readImage(path, augmentations=True)
-    print(np.array(image).shape)
-    plt.imshow(image.permute(1, 2, 0))
+    print(image.size())
+    print(image)
+
+
+    batch_tensor = [readImage(path, augmentations=True) for x in range(81)]
+    grid_img = torchvision.utils.make_grid(batch_tensor, nrow=9, pad_value=2)
+    plt.imshow(grid_img.permute(1, 2, 0))
     plt.show()
-
-    # batch_tensor = [readImage(path, augmentations=True) for x in range(81)]
-    # grid_img = torchvision.utils.make_grid(batch_tensor, nrow=9, pad_value=2)
-    # plt.imshow(grid_img.permute(1, 2, 0))
-    # plt.show()
-
-    # csv_url = '../input/train_labels.csv'
-    # data = pd.read_csv(csv_url)
-    # train_path = '../input/train/'
-    # test_path = '../input/test/'
-    # data['label'].value_counts()
-
-    # data_set = PCam_data_set(data, train_path, 'train')
-
-    # from sklearn.model_selection import train_test_split
-    # tr, vd = train_test_split(data, test_size=0.1, random_state=123)
-    # train_set = PCam_data_set(tr, train_path, 'train')
-    # valid_set = PCam_data_set(vd, train_path, 'valid')
-    # for image, label in valid_set:
-    #     print(image.dtype)
-    #     print(label)
-    #     break

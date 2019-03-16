@@ -1,10 +1,7 @@
-# get test id's from the sample_submission.csv and keep their original order
-from tqdm import tqdm
 from PCam_data_set import PCam_data_set
 from load_paramter import load_parameter
 from models.resnet import resnet18
 import pandas as pd
-import numpy as np
 import torch
 
 BATCH_SIZE = 128
@@ -29,7 +26,6 @@ def submit(model, model_name, device, test_path, csv_path):
     valid_loader = torch.utils.data.DataLoader(valid_set, batch_size=BATCH_SIZE,
                                                shuffle=False, num_workers=NUM_WORKERS)
     np_list = test_epoch(model, valid_loader, device)
-    print(len(sample_df),len(np_list))
     sample_df["label"]=np_list
     sample_df.to_csv(f"submit/{model_name}_submit.csv", index=False)
 
