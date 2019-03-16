@@ -16,6 +16,7 @@ import torch
 import torchvision
 import cv2
 import os
+import albumentations as A
 
 from PIL import Image
 
@@ -68,39 +69,49 @@ def croppedImage(image):
 
 
 def readImage(path, augmentations=False):
+
     # 读取图片
     image = readImagFromPath(path)
     # 数据预处理
     image = preTreat(image)
-
     if augmentations:
-        # 数据增强
+        # # 数据增强
+        # im_aug = torchvision.transforms.Compose([
+        #     torchvision.transforms.RandomHorizontalFlip(),
+        #     torchvision.transforms.RandomVerticalFlip(),
+        #     torchvision.transforms.ColorJitter(brightness=0.01, contrast=0.01, hue=0.01),
+        #     torchvision.transforms.RandomCrop(32),
+        #     torchvision.transforms.ToTensor(),
+        #     # torchvision.transforms.Normalize(std=(0.23889325, 0.28209431, 0.21625058),
+        #     #                                  mean=(0.70244707, 0.54624322, 0.69645334))
+        #
+        # ])
+        #
+        # image = Image.fromarray(image.astype('uint8')).convert('RGB')
+        # image = torchvision.transforms.RandomRotation(45)(image)
+        # image = torchvision.transforms.ToTensor()(image)
+        # image = image[:, 24:72, 24:72].permute(1, 2, 0)  # 中心48中裁剪32
+        # print(image.size())
+        # image = Image.fromarray(image.numpy()).convert('RGB')
+        # image = im_aug(image)
 
         im_aug = torchvision.transforms.Compose([
-            torchvision.transforms.RandomHorizontalFlip(),
-            torchvision.transforms.RandomVerticalFlip(),
-            torchvision.transforms.ColorJitter(brightness=0.01, contrast=0.01, hue=0.01),
-            torchvision.transforms.RandomCrop(32),
             torchvision.transforms.ToTensor(),
-            # torchvision.transforms.Normalize(std=(0.23889325, 0.28209431, 0.21625058),
-            #                                  mean=(0.70244707, 0.54624322, 0.69645334))
-
+            # torchvision.transforms.Normalize(std=(0.5, 0.5, 0.5), mean=(0.5, 0.5, 0.5))
         ])
-
+        # print(image)
+        # image = image[32:64, 32:64, :]
         image = Image.fromarray(image.astype('uint8')).convert('RGB')
-        image=  torchvision.transforms.RandomRotation(45)(image)
-        image=  torchvision.transforms.ToTensor()(image)
-        image = image[:,24:72, 24:72].permute(1, 2, 0)  # 中心48中裁剪32
-        print(image.size())
-        image = Image.fromarray(image.numpy()).convert('RGB')
         image = im_aug(image)
+
 
     else:
         im_aug = torchvision.transforms.Compose([
             torchvision.transforms.ToTensor(),
             # torchvision.transforms.Normalize(std=(0.5, 0.5, 0.5), mean=(0.5, 0.5, 0.5))
         ])
-        image = image[32:64, 32:64, :]
+        # print(image)
+        # image = image[32:64, 32:64, :]
         image = Image.fromarray(image.astype('uint8')).convert('RGB')
         image = im_aug(image)
     # image = torch.clamp(image, min=0.0, max=1.0)
@@ -128,14 +139,17 @@ class PCam_data_set(torch.utils.data.Dataset):
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     import torchvision
-
+    import numpy as np
     path = "input/train/test_img.tif"
-    batch_tensor = [readImage(path, augmentations=True) for x in range(81)]
-    # print(batch_tensor)
-    # print(np.array(image).shape)
-    grid_img = torchvision.utils.make_grid(batch_tensor, nrow=9, pad_value=2)
-    plt.imshow(grid_img.permute(1, 2, 0))
-    plt.show()
+    image=readImage(path, augmentations=True)
+    print(np.array(image).shape)
+
+
+
+    # batch_tensor = [readImage(path, augmentations=True) for x in range(81)]
+    # grid_img = torchvision.utils.make_grid(batch_tensor, nrow=9, pad_value=2)
+    # plt.imshow(grid_img.permute(1, 2, 0))
+    # plt.show()
 
     # csv_url = '../input/train_labels.csv'
     # data = pd.read_csv(csv_url)
