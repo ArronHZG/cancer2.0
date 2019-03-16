@@ -75,11 +75,10 @@ def readImage(path, augmentations=False):
 
     if augmentations:
         # 数据增强
-        image = image[24:72, 24:72, :]  # 中心48中裁剪32
+
         im_aug = torchvision.transforms.Compose([
             torchvision.transforms.RandomHorizontalFlip(),
             torchvision.transforms.RandomVerticalFlip(),
-            torchvision.transforms.RandomRotation(45),
             torchvision.transforms.ColorJitter(brightness=0.01, contrast=0.01, hue=0.01),
             torchvision.transforms.RandomCrop(32),
             torchvision.transforms.ToTensor(),
@@ -87,14 +86,23 @@ def readImage(path, augmentations=False):
             #                                  mean=(0.70244707, 0.54624322, 0.69645334))
 
         ])
+
+        image = Image.fromarray(image.astype('uint8')).convert('RGB')
+        image=  torchvision.transforms.RandomRotation(45)(image)
+        image=  torchvision.transforms.ToTensor()(image)
+        image = image[:,24:72, 24:72].permute(1, 2, 0)  # 中心48中裁剪32
+        print(image.size())
+        image = Image.fromarray(image.numpy()).convert('RGB')
+        image = im_aug(image)
+
     else:
-        image = image[32:64, 32:64, :]
         im_aug = torchvision.transforms.Compose([
             torchvision.transforms.ToTensor(),
             # torchvision.transforms.Normalize(std=(0.5, 0.5, 0.5), mean=(0.5, 0.5, 0.5))
         ])
-    image = Image.fromarray(image.astype('uint8')).convert('RGB')
-    image = im_aug(image)
+        image = image[32:64, 32:64, :]
+        image = Image.fromarray(image.astype('uint8')).convert('RGB')
+        image = im_aug(image)
     # image = torch.clamp(image, min=0.0, max=1.0)
     return image
 
@@ -122,7 +130,6 @@ if __name__ == '__main__':
     import torchvision
 
     path = "input/train/test_img.tif"
-    image = readImage(path, augmentations=False)
     batch_tensor = [readImage(path, augmentations=True) for x in range(81)]
     # print(batch_tensor)
     # print(np.array(image).shape)
