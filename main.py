@@ -55,21 +55,21 @@ model.cuda(device)
 criterion = torch.nn.CrossEntropyLoss().cuda(device)
 
 # 训练
-optimizer = torch.optim.ASGD(model.parameters(), lr=2e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+optimizer = torch.optim.ASGD(model.parameters(), lr=1e-1, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, test_size=test_size, num_epochs=[0, 20])
+            criterion, optimizer, device, test_size=test_size, num_epochs=[0, 10])
 
-optimizer = torch.optim.ASGD(model.parameters(), lr=2e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
-scheduler = CosineAnnealingLR(optimizer, T_max=8, eta_min=2e-6)
+optimizer = torch.optim.ASGD(model.parameters(), lr=1e-1, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+scheduler = CosineAnnealingLR(optimizer, T_max=10)
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[20, 36])
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[10, 25])
 
 optimizer = torch.optim.Adam(model.parameters(),lr=2e-2, betas=(0.9, 0.999), eps=1e-8,weight_decay=1e-6, amsgrad=True)
 scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5,
                               verbose=True, threshold=1e-4, threshold_mode='rel',
                               cooldown=0, min_lr=0, eps=1e-86)
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[36, 50])
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[25, 50])
 
 # models = PNASNet5Large(2)
 

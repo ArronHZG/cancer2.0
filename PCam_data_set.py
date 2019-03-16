@@ -80,7 +80,7 @@ def readImage(path, augmentations=False):
             torchvision.transforms.RandomHorizontalFlip(),
             torchvision.transforms.RandomVerticalFlip(),
             torchvision.transforms.RandomRotation(45),
-            torchvision.transforms.ColorJitter(brightness=0.1, contrast=0.1, hue=0.1),
+            torchvision.transforms.ColorJitter(brightness=0.01, contrast=0.01, hue=0.01),
             torchvision.transforms.RandomCrop(32),
             torchvision.transforms.ToTensor(),
             torchvision.transforms.Normalize(std=(0.23889325, 0.28209431, 0.21625058),
