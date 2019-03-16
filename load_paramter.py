@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 def load_parameter(model: torch.nn.Module, model_name, imageNet=False):
     if imageNet:
-        path_list = glob.glob(f"models_weight/imageNetWeight/{model_name}*.pth")
+        path_list = glob.glob(f"models_weight/imageNetWeight/*{model_name}*.pth")
         if path_list:
             model_dict=model.state_dict()
             parameter_dict = {k: v for k, v in torch.load(path_list[0]).items() if k in model_dict}

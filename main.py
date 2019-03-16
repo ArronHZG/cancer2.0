@@ -55,17 +55,17 @@ train_model(model, model_name, dataloaders,
 # 加载最优模型
 model = load_parameter(model, model_name)
 optimizer = torch.optim.ASGD(model.parameters(), lr=1e-1, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
-scheduler = CosineAnnealingLR(optimizer, T_max=10)
+scheduler = CosineAnnealingLR(optimizer, T_max=20, eta_min=1e-6)
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[10, 25])
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[10, 30])
 # 加载最优模型
 model = load_parameter(model, model_name)
-optimizer = torch.optim.Adam(model.parameters(), lr=2e-2, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-6, amsgrad=True)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-6, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-6, amsgrad=True)
 scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5,
                               verbose=True, threshold=1e-4, threshold_mode='rel',
                               cooldown=0, min_lr=0, eps=1e-86)
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[25, 30])
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[30, 50])
 
 # models = PNASNet5Large(2)
 
