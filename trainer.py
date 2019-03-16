@@ -5,6 +5,8 @@
 # 图模型结构：add_graph
 # 特征降维：add_embedding
 # 输出结果混淆矩阵：混淆矩阵
+import os
+
 import torch
 import time
 import copy
@@ -12,7 +14,9 @@ from tensorboardX import SummaryWriter
 from torch.optim import optimizer
 from tqdm import tqdm
 
-writer = SummaryWriter(f'./logs/tensorBoardX/{time.strftime("%Y-%m-%d--%H:%M:%S", time.localtime())}')
+START_TIME = time.strftime("%Y-%m-%d--%H:%M:%S", time.localtime())
+
+writer = SummaryWriter(f'./logs/tensorBoardX/{START_TIME}')
 
 class Acc:
     def __init__(self, name):
@@ -120,11 +124,14 @@ def valid_epoch(model, data_loaders, device, criterion, model_name, epoch, best_
     epoch_acc = acc.get()
     if epoch_acc > best_acc:
         best_model_wts = copy.deepcopy(model.state_dict())
-        local_PATH = './models_weight/MyWeight/{}--{}--{}--Loss--{:.4f}--Acc--{:.4f}.pth' \
+        local_path = "./models_weight/MyWeight/"+START_TIME
+        if not os.path.exists(local_path):
+            os.makedirs(local_path)
+        file_name = '/{}--{}--{}--Loss--{:.4f}--Acc--{:.4f}.pth' \
             .format(time.strftime("%Y-%m-%d--%H:%M:%S", time.localtime()),
                                                         model_name, epoch, epoch_loss, epoch_acc)
-        torch.save(best_model_wts, local_PATH)
-        print(f"save{local_PATH}")
+        torch.save(best_model_wts, os.path.join(local_path,file_name))
+        print(f"save{local_path}")
     return epoch_acc, epoch_loss
 
 
