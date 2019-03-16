@@ -69,7 +69,6 @@ def croppedImage(image):
 
 
 def readImage(path, augmentations=False):
-
     # 读取图片
     image = readImagFromPath(path)
     # 数据预处理
@@ -140,11 +139,10 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plt
     import torchvision
     import numpy as np
+
     path = "input/train/test_img.tif"
-    image=readImage(path, augmentations=True)
+    image = readImage(path, augmentations=True)
     print(np.array(image).shape)
-
-
 
     # batch_tensor = [readImage(path, augmentations=True) for x in range(81)]
     # grid_img = torchvision.utils.make_grid(batch_tensor, nrow=9, pad_value=2)

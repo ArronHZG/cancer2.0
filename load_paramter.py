@@ -14,7 +14,7 @@ def load_parameter(model: torch.nn.Module, model_name, imageNet=True):
         else:
             print("没有imageNet预训练模型")
     else:  # 加载最优模型
-        path_list = glob.glob(f"models_weight/MyWeight/*-{model_name}-Loss-*-Acc-*-models.pth")
+        path_list = glob.glob(f"models_weight/MyWeight/*-{model_name}-*.pth")
         if path_list:
             # 找到最大的acc权重
             dic = OrderedDict({float(path.split("-")[-2]): path for path in path_list})
