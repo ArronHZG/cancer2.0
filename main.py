@@ -22,8 +22,9 @@ NUM_WORKERS = 8
 device = 1
 # 加载数据
 INPUT_PATH = "/home/arron/文档/notebook/侯正罡/cancer/input"
-csv_url = INPUT_PATH + '/train_labels.csv'
-data = pd.read_csv(csv_url)
+train_csv_url = INPUT_PATH + '/train_labels.csv'
+test_csv_url = INPUT_PATH + '/sample_submission.csv'
+data = pd.read_csv(train_csv_url)
 train_path = INPUT_PATH + '/train/'
 test_path = INPUT_PATH + '/test/'
 data['label'].value_counts()

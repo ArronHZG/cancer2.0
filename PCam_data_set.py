@@ -21,7 +21,7 @@ import albumentations as A
 from PIL import Image
 
 
-def moramlize(train_path, shuffled_data):
+def noramlize(train_path, shuffled_data):
     import tqdm
     import numpy as np
     # As we count the statistics, we can check if there are any completely black or white images
@@ -143,6 +143,8 @@ if __name__ == '__main__':
     path = "input/train/test_img.tif"
     image = readImage(path, augmentations=True)
     print(np.array(image).shape)
+    plt.imshow(image.permute(1, 2, 0))
+    plt.show()
 
     # batch_tensor = [readImage(path, augmentations=True) for x in range(81)]
     # grid_img = torchvision.utils.make_grid(batch_tensor, nrow=9, pad_value=2)
