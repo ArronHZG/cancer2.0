@@ -42,7 +42,11 @@ dataloaders = {'train': train_loader, 'valid': valid_loader}
 model = resnet18(num_classes=2, pretrained=False)
 model_name = 'resnet18'
 # 模型参数加载
-model = load_parameter(model, model_name, imageNet=True)
+model = load_parameter(model,
+                       model_name,
+                       pre_weight='models_weight/MyWeight/' +
+                                  '2019-03-16--21:10:40/' +
+                                  '2019-03-17--00:12:53--resnet18--45--Loss--0.0945--Acc--0.9666.pth')
 # 加载到GPU
 model.cuda(device)
 # 损失函数
@@ -55,13 +59,13 @@ train_model(model, model_name, dataloaders,
 # 加载最优模型
 model = load_parameter(model, model_name)
 optimizer = torch.optim.ASGD(model.parameters(), lr=1e-1, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
-scheduler = CosineAnnealingLR(optimizer, T_max=20, eta_min=1e-6)
+scheduler = CosineAnnealingLR(optimizer, T_max=20, eta_min=1e-3)
 train_model(model, model_name, dataloaders,
             criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[10, 30])
 # 加载最优模型
 model = load_parameter(model, model_name)
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-6, betas=(0.9, 0.999), eps=1e-8, weight_decay=1e-6, amsgrad=True)
-scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=5,
+optimizer = torch.optim.ASGD(model.parameters(), lr=1e-3, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5,
                               verbose=True, threshold=1e-4, threshold_mode='rel',
                               cooldown=0, min_lr=0, eps=1e-86)
 train_model(model, model_name, dataloaders,

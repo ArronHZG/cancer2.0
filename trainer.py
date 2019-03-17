@@ -13,10 +13,13 @@ import copy
 from tensorboardX import SummaryWriter
 from torch.optim import optimizer
 from tqdm import tqdm
+import pandas as pd
+from collections import OrderedDict
 
 START_TIME = time.strftime("%Y-%m-%d--%H:%M:%S", time.localtime())
 
 writer = SummaryWriter(f'./logs/tensorBoardX/{START_TIME}')
+
 
 class Acc:
     def __init__(self, name):
@@ -124,14 +127,14 @@ def valid_epoch(model, data_loaders, device, criterion, model_name, epoch, best_
     epoch_acc = acc.get()
     if epoch_acc > best_acc:
         best_model_wts = copy.deepcopy(model.state_dict())
-        local_path = "./models_weight/MyWeight/"+START_TIME
+        local_path = "./models_weight/MyWeight/" + START_TIME
         if not os.path.exists(local_path):
             os.makedirs(local_path)
-        file_name = '/{}--{}--{}--Loss--{:.4f}--Acc--{:.4f}.pth' \
+        file_name = '{}--{}--{}--Loss--{:.4f}--Acc--{:.4f}.pth' \
             .format(time.strftime("%Y-%m-%d--%H:%M:%S", time.localtime()),
-                                                        model_name, epoch, epoch_loss, epoch_acc)
-        torch.save(best_model_wts, os.path.join(local_path,file_name))
-        print(f"save{local_path}")
+                    model_name, epoch, epoch_loss, epoch_acc)
+        torch.save(best_model_wts, os.path.join(local_path, file_name))
+        print(f"save{os.path.join(local_path, file_name)}")
     return epoch_acc, epoch_loss
 
 
@@ -141,17 +144,23 @@ def train_model(model, model_name, data_loaders, criterion, optimizer: optimizer
         num_epochs = [0, 25]
     best_acc = 0.0
     gap = int((1 - test_size) * 10)
+    logs = OrderedDict({'train_loss': [], "train_acc": [], 'valid_loss': [], 'valid_acc': []})
     for epoch in range(num_epochs[0], num_epochs[1]):
-        # print(f"epoch:{epoch}")
-        start_time=time.time()
+        start_time = time.time()
         train_acc, train_loss = train_epoch(model, data_loaders, optimizer, device, criterion,
-                                            epoch,scheduler=scheduler)
+                                            epoch, scheduler=scheduler)
         valid_acc, valid_loss = valid_epoch(model, data_loaders, device, criterion, model_name,
                                             epoch, best_acc, gap)
-        time_elapsed=time.time()-start_time
-        last_time="{:.0f}m {:.0f}s".format(time_elapsed // 60, time_elapsed % 60)
+        time_elapsed = time.time() - start_time
+        last_time = "{:.0f}m {:.0f}s".format(time_elapsed // 60, time_elapsed % 60)
         if valid_acc > best_acc:
             best_acc = valid_acc
-
-        print("epoch:{:4}--train_acc:{:4f}--valid_acc:{:4f}--train_loss:{:4f}--valid_loss:{:4f}--time:{}"
-              .format(epoch, train_acc, valid_acc, train_loss, valid_loss, last_time))
+        log = "epoch:{:4}--train_loss:{:4f}--train_acc:{:4f}--valid_loss:{:4f}--valid_acc:{:4f}--time:{}" \
+            .format(epoch, train_loss, train_acc, valid_loss, valid_acc, last_time)
+        print(log)
+        logs['train_loss'].append(train_loss)
+        logs['train_acc'].append(train_acc)
+        logs['valid_loss'].append(valid_loss)
+        logs['valid_acc'].append(valid_acc)
+    df = pd.DataFrame(logs)
+    df.to_csv(f"logs/csv/{START_TIME}.csv")
