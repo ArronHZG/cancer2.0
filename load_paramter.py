@@ -23,8 +23,9 @@ def load_parameter(model: torch.nn.Module, model_name, imageNet=False, pre_weigh
             path_list = glob.glob(f"models_weight/MyWeight/{START_TIME}/*{model_name}-*.pth")
             if path_list:
                 # 找到最大的acc权重
-                dic = OrderedDict({float(path.split("-")[-2]): path for path in path_list})
+                dic = OrderedDict({path.split("--")[-1].split(".")[-2]: path for path in path_list})
                 keys = sorted(dic.keys())
+                print(keys)
                 # 得到对应路径
                 path = dic[keys[-1]]
                 print(f"load: {path}")
@@ -39,4 +40,4 @@ def load_parameter(model: torch.nn.Module, model_name, imageNet=False, pre_weigh
 
 
 if __name__ == '__main__':
-    load_parameter(None, model_name="resnet18", imageNet=False)
+    load_parameter(None, model_name="resnet18")
