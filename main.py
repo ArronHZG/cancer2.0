@@ -58,7 +58,7 @@ train_model(model, model_name, dataloaders,
             criterion, optimizer, device, scheduler=None, test_size=test_size, num_epochs=[0, 20])
 # 加载最优模型
 model = load_parameter(model, model_name)
-optimizer = torch.optim.ASGD(model.parameters(), lr=1e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+optimizer = torch.optim.ASGD(model.parameters(), lr=1e-1, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
 scheduler = CosineAnnealingLR(optimizer, T_max=30, eta_min=1e-3)
 train_model(model, model_name, dataloaders,
             criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[20, 50])
