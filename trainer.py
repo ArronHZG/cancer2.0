@@ -103,7 +103,7 @@ def train_epoch(model, data_loaders, optimizer, device, criterion, epoch, schedu
         epoch_acc = acc.get()
         if scheduler:
             if type(scheduler) == torch.optim.lr_scheduler.ReduceLROnPlateau:
-                scheduler.step(epoch_loss)
+                pass
             else:
                 scheduler.step()
     return epoch_acc, epoch_loss
@@ -127,14 +127,14 @@ def valid_epoch(model, data_loaders, device, criterion, model_name, epoch, best_
     epoch_acc = acc.get()
     if epoch_acc > best_acc:
         best_model_wts = copy.deepcopy(model.state_dict())
-        local_path = "./models_weight/MyWeight/" + START_TIME
+        local_path = "models_weight/MyWeight/" + START_TIME
         if not os.path.exists(local_path):
             os.makedirs(local_path)
         file_name = '{}--{}--{}--Loss--{:.4f}--Acc--{:.4f}.pth' \
             .format(time.strftime("%Y-%m-%d--%H:%M:%S", time.localtime()),
                     model_name, epoch, epoch_loss, epoch_acc)
         torch.save(best_model_wts, os.path.join(local_path, file_name))
-        print(f"save{os.path.join(local_path, file_name)}")
+        print(f"save: {os.path.join(local_path, file_name)}")
     return epoch_acc, epoch_loss
 
 
@@ -151,6 +151,8 @@ def train_model(model, model_name, data_loaders, criterion, optimizer: optimizer
                                             epoch, scheduler=scheduler)
         valid_acc, valid_loss = valid_epoch(model, data_loaders, device, criterion, model_name,
                                             epoch, best_acc, gap)
+        if type(scheduler) == torch.optim.lr_scheduler.ReduceLROnPlateau:
+            scheduler.step(valid_loss)
         time_elapsed = time.time() - start_time
         last_time = "{:.0f}m {:.0f}s".format(time_elapsed // 60, time_elapsed % 60)
         if valid_acc > best_acc:

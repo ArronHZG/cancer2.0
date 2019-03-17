@@ -9,7 +9,7 @@
 # CosineAnnealingLR
 import pandas as pd
 import torch
-from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau, CosineAnnealingLR, StepLR
+from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingLR
 from sklearn.model_selection import train_test_split
 from PCam_data_set import PCam_data_set
 from load_paramter import load_parameter
@@ -45,8 +45,8 @@ model_name = 'resnet18'
 model = load_parameter(model,
                        model_name,
                        pre_weight='models_weight/MyWeight/' +
-                                  '2019-03-17--13:29:01/' +
-                                  '2019-03-17--14:05:01--resnet18--8--Loss--0.1192--Acc--0.9578.pth')
+                                  '2019-03-17--14:34:45/' +
+                                  '2019-03-17--17:38:43--resnet18--46--Loss--0.0699--Acc--0.9767.pth')
 # 加载到GPU
 model.cuda(device)
 # 损失函数
@@ -58,10 +58,10 @@ train_model(model, model_name, dataloaders,
             criterion, optimizer, device, scheduler=None, test_size=test_size, num_epochs=[0, 20])
 # 加载最优模型
 model = load_parameter(model, model_name)
-optimizer = torch.optim.ASGD(model.parameters(), lr=1e-1, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
-scheduler = CosineAnnealingLR(optimizer, T_max=20, eta_min=1e-3)
+optimizer = torch.optim.ASGD(model.parameters(), lr=1e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+scheduler = CosineAnnealingLR(optimizer, T_max=30, eta_min=1e-3)
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[20, 40])
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[20, 50])
 # 加载最优模型
 model = load_parameter(model, model_name)
 optimizer = torch.optim.ASGD(model.parameters(), lr=1e-3, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
@@ -69,7 +69,11 @@ scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5,
                               verbose=True, threshold=1e-4, threshold_mode='rel',
                               cooldown=0, min_lr=0, eps=1e-86)
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[40, 80])
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[50, 80])
+
+
+
+
 
 # models = PNASNet5Large(2)
 
