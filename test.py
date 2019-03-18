@@ -7,3 +7,4 @@ image = a.hist()
 image.show()
 # plt.imshow(image)
 # plt.show()
+from torchvision.models import densenet201

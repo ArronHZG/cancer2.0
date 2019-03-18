@@ -13,6 +13,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingLR, StepL
 from sklearn.model_selection import train_test_split
 from PCam_data_set import PCam_data_set
 from load_paramter import load_parameter
+from models.densenet import densenet201
 from models.resnet import resnet18
 from trainer import train_model, writer
 from torchsummary import summary
@@ -39,8 +40,8 @@ valid_loader = torch.utils.data.DataLoader(valid_set, batch_size=BATCH_SIZE,
                                            shuffle=False, num_workers=NUM_WORKERS)
 dataloaders = {'train': train_loader, 'valid': valid_loader}
 # 加载模型
-model = resnet18(num_classes=2, pretrained=False)
-model_name = 'resnet18'
+model = densenet201(num_classes=2, pretrained=False)
+model_name = 'densenet201'
 # 模型参数加载
 model = load_parameter(model,
                        model_name,
@@ -54,19 +55,19 @@ model.cuda(device)
 criterion = torch.nn.CrossEntropyLoss().cuda(device)
 
 # 训练
-optimizer = torch.optim.ASGD(model.parameters(), lr=2e-1, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
-scheduler = StepLR(optimizer, step_size=, gamma=0.1, )
+optimizer = torch.optim.ASGD(model.parameters(), lr=1e-6, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+scheduler = StepLR(optimizer, step_size=1, gamma=1.5)
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler=scheduler, test_size=test_size, num_epochs=[0, 40])
+            criterion, optimizer, device, scheduler=scheduler, test_size=test_size, num_epochs=[0, 30])
 # 加载最优模型
 model = load_parameter(model, model_name)
 optimizer = torch.optim.ASGD(model.parameters(), lr=2e-1, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
-scheduler = CosineAnnealingLR(optimizer, T_max=50, eta_min=2e-2)
+scheduler = CosineAnnealingLR(optimizer, T_max=50, eta_min=1e-3)
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[40, 90])
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[30, 90])
 # 加载最优模型
 model = load_parameter(model, model_name)
-optimizer = torch.optim.ASGD(model.parameters(), lr=3e-3, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
+optimizer = torch.optim.ASGD(model.parameters(), lr=1e-3, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-6)
 scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5,
                               verbose=True, threshold=1e-4, threshold_mode='rel',
                               cooldown=0, min_lr=0, eps=1e-86)
