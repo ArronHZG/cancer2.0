@@ -98,7 +98,7 @@ def train_epoch(model, data_loaders, optimizer, device, criterion, epoch, schedu
             loss.update(c_loss.item(), epoch * data_size + i)
             acc.update(pred, labels, epoch * data_size + i)
             i += 1
-            writer.add_scalar("learningRate", optimizer.param_groups[0]['lr'], epoch * data_size + i)
+        writer.add_scalar("learningRate", optimizer.param_groups[0]['lr'], epoch * data_size + i)
         epoch_loss = loss.get()
         epoch_acc = acc.get()
         if scheduler:
