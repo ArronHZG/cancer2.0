@@ -61,8 +61,8 @@ def readImagFromPath(path):
 
 
 def preTreat(image):
-    image = image[32:64, 32:64, :]
-    image = cv2.resize(image, (96, 96), cv2.INTER_LINEAR)
+    # image = image[32:64, 32:64, :]
+    # image = cv2.resize(image, (96, 96), cv2.INTER_LINEAR)
     return image
 
 
@@ -97,7 +97,7 @@ def strong_aug(p=.5):
 
 
 
-def readImage(path, augmentations=False,test=False):
+def readImage(path, augmentations=False):
     # 读取图片
     image = readImagFromPath(path)
     # 数据预处理
@@ -106,8 +106,7 @@ def readImage(path, augmentations=False,test=False):
         # std=(0.23889325, 0.28209431, 0.21625058),
         # mean=(0.70244707, 0.54624322, 0.69645334))
         image = strong_aug(p=1)(image=image)["image"]
-    if test:
-        pass
+
     image = A.Normalize(mean=(0.70244707, 0.54624322, 0.69645334),std=(0.23889325, 0.28209431, 0.21625058))(image = image)["image"]
     image=torch.from_numpy(image)
     image=image.permute(2,0,1)
@@ -119,7 +118,6 @@ class PCam_data_set(torch.utils.data.Dataset):
     def __init__(self, csv_df, root_dir, usage):
         assert usage == 'train' or usage == 'valid' or usage == 'test'
         self._augmentations = True if usage == 'train' else False
-        self._test = True if usage == 'test' else False
         self._df = csv_df
         self._root_dir = root_dir
 
@@ -129,7 +127,7 @@ class PCam_data_set(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         image = readImage(os.path.join(self._root_dir, self._df.iloc[idx, 0] + '.tif'),
-                          augmentations=self._augmentations,test=self._test)
+                          augmentations=self._augmentations)
         label = self._df.iloc[idx, 1]
         return image, label
 

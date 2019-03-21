@@ -2,6 +2,7 @@ from tqdm import tqdm
 
 from PCam_data_set import PCam_data_set
 from load_paramter import load_parameter
+from models.densenet import densenet201
 from models.resnet import resnet18
 import pandas as pd
 import torch
@@ -41,15 +42,14 @@ if __name__ == '__main__':
     device = 0
 
     # 加载模型
-    model = resnet18(num_classes=2, pretrained=False)
-    model_name = 'resnet18'
-    # 模型参数加载
+    model = densenet201(num_classes=2, pretrained=False)
+    model_name = 'denseNet201'
     # 模型参数加载
     model = load_parameter(model,
                            model_name,
                            pre_weight='models_weight/MyWeight/' +
-                                      '2019-03-17--14:34:45/' +
-                                      '2019-03-17--17:38:43--resnet18--46--Loss--0.0699--Acc--0.9767.pth')
+                                      '2019-03-19--01:52:46/' +
+                                      '2019-03-19--10:39:56--densenet201--80--Loss--0.2329--Acc--0.9056.pth')
 
     # 加载到GPU
     model.cuda(device)
