@@ -17,6 +17,7 @@ from models.densenet import densenet201
 from models.resnet import resnet18
 from trainer import train_model, writer
 from torchsummary import summary
+from my_lr_scheduler.gradualWarmupScheduler import GradualWarmupScheduler
 
 BATCH_SIZE = 128
 NUM_WORKERS = 8
@@ -45,47 +46,40 @@ model_name = 'densenet201'
 # 模型参数加载
 model = load_parameter(model,
                        model_name,
-                       imageNet=True)
-                       # pre_weight='models_weight/MyWeight/' +
-                       #            '2019-03-17--23:29:48/' +
-                       #            '2019-03-18--05:49:37--resnet18--94--Loss--0.2453--Acc--0.9090.pth')
+                       type="pre_model",
+                       pre_model='/home/arron/文档/Projects/PycharmProjects/'+
+                                 'cancer2.0/models_weight/MyWeight/'+
+                                 '2019-03-22--19:50:11/'+
+                                 '2019-03-22--21:08:38--densenet201--11--Loss--0.0880--Acc--0.9697.pth')
+if torch.cuda.device_count() > 1:
+  print("Let's use", torch.cuda.device_count(), "GPUs!")
+  model = torch.nn.DataParallel(model)
+  device = 0
+
+
 # 加载到GPU
-model.cuda(device)
+if torch.cuda.is_available():
+    model.cuda(device)
 # 损失函数
 criterion = torch.nn.CrossEntropyLoss().cuda(device)
 
 # 训练
-optimizer = torch.optim.ASGD(model.parameters(), lr=1e-6, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-4)
-scheduler = StepLR(optimizer, step_size=1, gamma=1.5)
-train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler=scheduler, test_size=test_size, num_epochs=[0, 30])
+# optimizer = torch.optim.ASGD(model.parameters(), lr=1e-6, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-4)
+# # scheduler = StepLR(optimizer, step_size=1, gamma=1.5)
+# scheduler = GradualWarmupScheduler(optimizer, multiplier=20000, total_epoch=30)
+# train_model(model, model_name, dataloaders,
+#             criterion, optimizer, device, scheduler=scheduler, test_size=test_size, num_epochs=[0, 30])
 # 加载最优模型
-model = load_parameter(model, model_name)
-optimizer = torch.optim.ASGD(model.parameters(), lr=2e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-4)
-scheduler = CosineAnnealingLR(optimizer, T_max=50, eta_min=1e-3)
-train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[30, 90])
-# 加载最优模型
-model = load_parameter(model, model_name)
-optimizer = torch.optim.ASGD(model.parameters(), lr=1e-3, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-4)
+# model = load_parameter(model, model_name,type = 'acc_model')
+# optimizer = torch.optim.ASGD(model.parameters(), lr=2e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-4)
+# scheduler = CosineAnnealingLR(optimizer, T_max=15, eta_min=2e-3)
+# train_model(model, model_name, dataloaders,
+#             criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[0, 60])
+# # 加载最优模型
+# model = load_parameter(model, model_name, type = 'acc_model')
+optimizer = torch.optim.ASGD(model.parameters(), lr=1e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-4)
 scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5,
                               verbose=True, threshold=1e-4, threshold_mode='rel',
                               cooldown=0, min_lr=0, eps=1e-86)
 train_model(model, model_name, dataloaders,
-            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[90, 120])
-
-
-
-
-
-# models = PNASNet5Large(2)
-
-# 开启多个GPU
-# if torch.cuda.device_count() > 1:
-#     print("Let's use", torch.cuda.device_count(), "GPUs!")
-#     # dim = 0 [30, xxx] -> [10, ...], [10, ...], [10, ...] on 3 GPUs
-#     models = nn.DataParallel(models)
-# 恢复模型
-# PATH = '../weight/resnet50-7-Loss-0.7759 Acc-0.5334-models.pth'
-# models.load_state_dict(torch.load(PATH))
-# models.eval()
+            criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[0, 120])

@@ -79,6 +79,16 @@ class LearningRate:
 #         writer.add_scalar(key, item)
 
 
+def logs_toCSV(train_loss,train_acc,valid_loss,valid_acc):
+    logs = OrderedDict({'train_loss': [train_loss], "train_acc": [train_acc], 'valid_loss': [valid_loss], 'valid_acc': [valid_acc]})
+    # logs['train_loss'].append(train_loss)
+    # logs['train_acc'].append(train_acc)
+    # logs['valid_loss'].append(valid_loss)
+    # logs['valid_acc'].append(valid_acc)
+    df = pd.DataFrame(logs)
+    df.to_csv(f"logs/csv/{START_TIME}.csv",mode='a', header=False)
+
+
 def train_epoch(model, data_loaders, optimizer, device, criterion, epoch, scheduler=None):
     acc = Acc("train_batch_acc")
     loss = Loss("train_batch_loss")
@@ -144,7 +154,7 @@ def train_model(model, model_name, data_loaders, criterion, optimizer: optimizer
         num_epochs = [0, 25]
     best_acc = 0.0
     gap = int((1 - test_size) * 10)
-    logs = OrderedDict({'train_loss': [], "train_acc": [], 'valid_loss': [], 'valid_acc': []})
+
     for epoch in range(num_epochs[0], num_epochs[1]):
         start_time = time.time()
         train_acc, train_loss = train_epoch(model, data_loaders, optimizer, device, criterion,
@@ -160,9 +170,4 @@ def train_model(model, model_name, data_loaders, criterion, optimizer: optimizer
         log = "epoch:{:4}--train_loss:{:4f}--train_acc:{:4f}--valid_loss:{:4f}--valid_acc:{:4f}--time:{}" \
             .format(epoch, train_loss, train_acc, valid_loss, valid_acc, last_time)
         print(log)
-        logs['train_loss'].append(train_loss)
-        logs['train_acc'].append(train_acc)
-        logs['valid_loss'].append(valid_loss)
-        logs['valid_acc'].append(valid_acc)
-    df = pd.DataFrame(logs)
-    df.to_csv(f"logs/csv/{START_TIME}.csv")
+        logs_toCSV(train_loss,train_acc,valid_loss,valid_acc)

@@ -1,6 +1,6 @@
 import torch
 
-from warmup_scheduler import GradualWarmupScheduler
+from gradualWarmupScheduler import GradualWarmupScheduler
 
 
 if __name__ == '__main__':
