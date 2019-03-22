@@ -3,10 +3,14 @@ import torch
 from collections import OrderedDict
 from trainer import START_TIME
 
-def load_parameter(model, model_name, type , pre_model = None):
+def load_parameter(model, model_name, type, pre_model = None):
 
     if not type:
-        print("未选择模式")
+        print("未选择模式，kaiming_uniform 初始化参数")
+        model_dict = model.state_dict()
+        parameter_dict = {k: torch.nn.init.kaiming_uniform(v) for k, v in model_dict}
+        model_dict.update(parameter_dict)
+        model.load_state_dict(model_dict)
         return model
 
     if type == "pre_model":
