@@ -2,6 +2,7 @@
 input/
 logs/
 models_weight/
+submit/
 .idea/
 __pycache__/
 models/__pycache__/
