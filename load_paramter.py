@@ -51,4 +51,4 @@ def load_parameter(model, model_name, type , pre_model = None):
 
 
 if __name__ == '__main__':
-    load_parameter(None, model_name="resnet18")
+    load_parameter(None, model_name="resnet18.txt")

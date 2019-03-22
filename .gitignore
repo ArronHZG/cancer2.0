@@ -3,3 +3,5 @@ input/
 logs/
 models_weight/
 .idea/
+__pycache__/
+models/__pycache__/
