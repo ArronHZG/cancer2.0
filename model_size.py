@@ -8,7 +8,7 @@ import torch
 model = densenet201(num_classes=2, pretrained=False)
 model_name = 'densenet201'
 # 模型打印
-summary(model, (3, 96, 96))
+summary(model, (3, 96, 96),device="cpu")
 # model可视化
 # x = torch.rand(1, 3, 96, 96)  # 随便定义一个输入
 # writer.add_graph(model, x)
