@@ -1,6 +1,4 @@
-from __future__ import print_function, division, absolute_import
 from collections import OrderedDict
-
 import torch
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo

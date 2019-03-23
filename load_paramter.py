@@ -1,14 +1,20 @@
 import glob
 import torch
 from collections import OrderedDict
+
+from models.pnasnet import pnasnet5large
 from trainer import START_TIME
 
-def load_parameter(model, model_name, type, pre_model = None):
+def load_parameter(model, model_name, type=None, pre_model = None):
 
     if not type:
         print("未选择模式，kaiming_uniform 初始化参数")
         model_dict = model.state_dict()
-        parameter_dict = {k: torch.nn.init.kaiming_uniform(v) for k, v in model_dict}
+        parameter_dict = OrderedDict()
+        for k, v in model_dict.items():
+            # print(k,"\t\t\t\t\t\t\t\t", v.size())
+            if len(v.size())>1:
+                parameter_dict[k]=torch.nn.init.kaiming_uniform(v)
         model_dict.update(parameter_dict)
         model.load_state_dict(model_dict)
         return model
@@ -55,4 +61,6 @@ def load_parameter(model, model_name, type, pre_model = None):
 
 
 if __name__ == '__main__':
-    load_parameter(None, model_name="resnet18.txt")
+    model = pnasnet5large(num_classes=2, pretrained=False)
+    model_name = 'pnasnet5large'
+    load_parameter(model, model_name=model_name)
