@@ -17,7 +17,7 @@ from models.pnasnet import pnasnet5large
 from trainer import train_model, logs_toCSV
 from my_lr_scheduler.gradualWarmupScheduler import GradualWarmupScheduler
 
-BATCH_SIZE = 128
+BATCH_SIZE = 100
 NUM_WORKERS = 8
 device = 1
 # 加载数据
