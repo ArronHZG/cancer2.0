@@ -14,7 +14,7 @@ def load_parameter(model, model_name, type=None, pre_model = None):
         for k, v in model_dict.items():
             # print(k,"\t\t\t\t\t\t\t\t", v.size())
             if len(v.size())>1:
-                parameter_dict[k]=torch.nn.init.kaiming_uniform(v)
+                parameter_dict[k]=torch.nn.init.kaiming_uniform_(v)
         model_dict.update(parameter_dict)
         model.load_state_dict(model_dict)
         return model

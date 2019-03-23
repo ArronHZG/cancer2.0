@@ -62,7 +62,7 @@ def readImagFromPath(path):
 
 def preTreat(image):
     # image = image[32:64, 32:64, :]
-    image = cv2.resize(image, (331, 331), cv2.INTER_LINEAR)
+    # image = cv2.resize(image, (331, 331), cv2.INTER_LINEAR)
     return image
 
 

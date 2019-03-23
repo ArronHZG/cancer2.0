@@ -13,14 +13,11 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau, CosineAnnealingLR, StepL
 from sklearn.model_selection import train_test_split
 from PCam_data_set import PCam_data_set
 from load_paramter import load_parameter
-from models.densenet import densenet201
 from models.pnasnet import pnasnet5large
-from models.resnet import resnet18
-from trainer import train_model, writer
-from torchsummary import summary
+from trainer import train_model, logs_toCSV
 from my_lr_scheduler.gradualWarmupScheduler import GradualWarmupScheduler
 
-BATCH_SIZE = 10
+BATCH_SIZE = 128
 NUM_WORKERS = 8
 device = 1
 # 加载数据
@@ -46,16 +43,21 @@ model = pnasnet5large(num_classes=2, pretrained=False)
 model_name = 'pnasnet5large'
 # 模型参数加载
 model = load_parameter(model,model_name)
-if torch.cuda.device_count() > 1:
-    print("Let's use", torch.cuda.device_count(), "GPUs!")
-    model = torch.nn.DataParallel(model)
-    device = 0
+
+# 双卡开启
+# if torch.cuda.device_count() > 1:
+#     print("Let's use", torch.cuda.device_count(), "GPUs!")
+#     model = torch.nn.DataParallel(model)
+#     device = 0
 
 # 加载到GPU
 if torch.cuda.is_available():
     model.cuda(device)
 # 损失函数
 criterion = torch.nn.CrossEntropyLoss().cuda(device)
+
+# 日志CSV头设置
+logs_toCSV(header=True)
 
 # 训练
 optimizer = torch.optim.ASGD(model.parameters(), lr=1e-4, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-4)
@@ -70,3 +72,6 @@ scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.8, patience=3,
                               cooldown=0, min_lr=0, eps=1e-86)
 train_model(model, model_name, dataloaders,
             criterion, optimizer, device, scheduler, test_size=test_size, num_epochs=[20, 200])
+
+
+# python -u p_main.py 2>&1 | tee logs/csv/20190323_train.log

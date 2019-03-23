@@ -51,10 +51,10 @@ model = load_parameter(model,
                                  'cancer2.0/models_weight/MyWeight/'+
                                  '2019-03-22--19:50:11/'+
                                  '2019-03-22--21:08:38--densenet201--11--Loss--0.0880--Acc--0.9697.pth')
-if torch.cuda.device_count() > 1:
-  print("Let's use", torch.cuda.device_count(), "GPUs!")
-  model = torch.nn.DataParallel(model)
-  device = 0
+# if torch.cuda.device_count() > 1:
+#   print("Let's use", torch.cuda.device_count(), "GPUs!")
+#   model = torch.nn.DataParallel(model)
+#   device = 0
 
 
 # 加载到GPU

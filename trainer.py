@@ -79,14 +79,10 @@ class LearningRate:
 #         writer.add_scalar(key, item)
 
 
-def logs_toCSV(train_loss,train_acc,valid_loss,valid_acc):
+def logs_toCSV(train_loss=None,train_acc=None,valid_loss=None,valid_acc=None,header=False):
     logs = OrderedDict({'train_loss': [train_loss], "train_acc": [train_acc], 'valid_loss': [valid_loss], 'valid_acc': [valid_acc]})
-    # logs['train_loss'].append(train_loss)
-    # logs['train_acc'].append(train_acc)
-    # logs['valid_loss'].append(valid_loss)
-    # logs['valid_acc'].append(valid_acc)
     df = pd.DataFrame(logs)
-    df.to_csv(f"logs/csv/{START_TIME}.csv",mode='a', header=False)
+    df.to_csv(f"logs/csv/{START_TIME}.csv",mode='a', header=header,index=False)
 
 
 def train_epoch(model, data_loaders, optimizer, device, criterion, epoch, scheduler=None):
@@ -171,3 +167,6 @@ def train_model(model, model_name, data_loaders, criterion, optimizer: optimizer
             .format(epoch, train_loss, train_acc, valid_loss, valid_acc, last_time)
         print(log)
         logs_toCSV(train_loss,train_acc,valid_loss,valid_acc)
+
+if __name__ == '__main__':
+    logs_toCSV(header=True)

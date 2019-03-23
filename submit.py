@@ -10,7 +10,7 @@ import torch
 from models.resnet import resnet18
 from trainer import START_TIME
 
-BATCH_SIZE = 20
+BATCH_SIZE = 128
 NUM_WORKERS = 8
 
 
