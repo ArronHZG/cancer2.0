@@ -17,16 +17,14 @@ from models.pnasnet import pnasnet5large
 from trainer import train_model, logs_toCSV
 from my_lr_scheduler.gradualWarmupScheduler import GradualWarmupScheduler
 
-BATCH_SIZE = 100
+BATCH_SIZE = 80
 NUM_WORKERS = 8
 device = 1
-# 加载数据
+#s 加载数据
 INPUT_PATH = "/home/arron/文档/notebook/侯正罡/cancer/input"
 train_csv_url = INPUT_PATH + '/train_labels.csv'
-test_csv_url = INPUT_PATH + '/sample_submission.csv'
 data = pd.read_csv(train_csv_url)
 train_path = INPUT_PATH + '/train/'
-test_path = INPUT_PATH + '/test/'
 data['label'].value_counts()
 # 切分训练集和验证集
 test_size = 0.1
@@ -45,10 +43,10 @@ model_name = 'pnasnet5large'
 model = load_parameter(model,model_name)
 
 # 双卡开启
-# if torch.cuda.device_count() > 1:
-#     print("Let's use", torch.cuda.device_count(), "GPUs!")
-#     model = torch.nn.DataParallel(model)
-#     device = 0
+if torch.cuda.device_count() > 1:
+    print("Let's use", torch.cuda.device_count(), "GPUs!")
+    model = torch.nn.DataParallel(model)
+    device = 0
 
 # 加载到GPU
 if torch.cuda.is_available():

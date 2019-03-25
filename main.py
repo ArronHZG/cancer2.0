@@ -78,7 +78,7 @@ criterion = torch.nn.CrossEntropyLoss().cuda(device)
 # # 加载最优模型
 # model = load_parameter(model, model_name, type = 'acc_model')
 optimizer = torch.optim.ASGD(model.parameters(), lr=1e-2, lambd=1e-4, alpha=0.75, t0=1e6, weight_decay=1e-4)
-scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=5,
+scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.7, patience=5,
                               verbose=True, threshold=1e-4, threshold_mode='rel',
                               cooldown=0, min_lr=0, eps=1e-86)
 train_model(model, model_name, dataloaders,
