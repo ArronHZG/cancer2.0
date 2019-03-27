@@ -1,6 +1,7 @@
 numpy
-tqdm
 pandas
+matplotlib
+tqdm
 torchvision
 torchsummary
 tensorboardX
