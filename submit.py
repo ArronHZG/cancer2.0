@@ -48,32 +48,32 @@ if __name__ == '__main__':
     test_csv_url = INPUT_PATH + '/sample_submission.csv'
     device = 0
 
-    # 加载模型
-    model = resnet18(num_classes=2, pretrained=False)
-    model_name = 'resnet18'
-    # 模型参数加载
-    model = load_parameter(model,
-                           model_name,
-                           type='pre_model',
-                           pre_model='models_weight/MyWeight/' +
-                                     '2019-03-17--14:34:45/' +
-                                     '2019-03-17--17:38:43--resnet18--46--Loss--0.0699--Acc--0.9767.pth')
-    submit(model, model_name, device, test_path, test_csv_url)
+    # # 加载模型
+    # model = resnet18(num_classes=2, pretrained=False)
+    # model_name = 'resnet18'
+    # # 模型参数加载
+    # model = load_parameter(model,
+    #                        model_name,
+    #                        type='pre_model',
+    #                        pre_model='models_weight/MyWeight/' +
+    #                                  '2019-03-17--14:34:45/' +
+    #                                  '2019-03-17--17:38:43--resnet18--46--Loss--0.0699--Acc--0.9767.pth')
+    # submit(model, model_name, device, test_path, test_csv_url)
+    #
+    # # 加载模型
+    # model = pnasnet5large(num_classes=2, pretrained=False)
+    # model_name = 'pnasnet5large'
+    # # 模型参数加载
+    # model = load_parameter(model,
+    #                        model_name,
+    #                        type='pre_model',
+    #                        pre_model='models_weight/MyWeight/' +
+    #                                   '2019-03-24--15:32:27/' +
+    #                                   '2019-03-27--03:40:56--pnasnet5large--184--Loss--0.0680--Acc--0.9847.pth')
+    #
+    # submit(model, model_name, device, test_path, test_csv_url)
 
-    # 加载模型
-    model = pnasnet5large(num_classes=2, pretrained=False)
-    model_name = 'pnasnet5large'
-    # 模型参数加载
-    model = load_parameter(model,
-                           model_name,
-                           type='pre_model',
-                           pre_model='models_weight/MyWeight/' +
-                                      '2019-03-24--15:32:27/' +
-                                      '2019-03-27--03:40:56--pnasnet5large--184--Loss--0.0680--Acc--0.9847.pth')
-
-    submit(model, model_name, device, test_path, test_csv_url)
-
-    test = False
+    test = True
     if test:
         train_csv_url = INPUT_PATH + '/train_labels.csv'
         data = pd.read_csv(train_csv_url)
@@ -83,15 +83,15 @@ if __name__ == '__main__':
         valid_len = vd.count()["id"]
 
         # 加载模型
-        model = resnet18(num_classes=2, pretrained=False)
-        model_name = 'resnet18'
+        model = pnasnet5large(num_classes=2, pretrained=False)
+        model_name = 'pnasnet5large'
         # 模型参数加载
         model = load_parameter(model,
                                model_name,
                                type='pre_model',
                                pre_model='models_weight/MyWeight/' +
-                                         '2019-03-17--14:34:45/' +
-                                         '2019-03-17--17:38:43--resnet18--46--Loss--0.0699--Acc--0.9767.pth')
+                                          '2019-03-24--15:32:27/' +
+                                          '2019-03-27--03:40:56--pnasnet5large--184--Loss--0.0680--Acc--0.9847.pth')
 
         model.cuda(device)
         model.eval()
