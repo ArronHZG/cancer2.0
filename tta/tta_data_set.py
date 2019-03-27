@@ -30,7 +30,7 @@ def readImage(path,times):
 
 class TTA_data_set(Dataset):
 
-    def __init__(self, csv_ddf, root_dir, tta_times):
+    def __init__(self, csv_df, root_dir, tta_times):
         self._df = csv_df
         self._root_dir = root_dir
         self.tta_times = tta_times
