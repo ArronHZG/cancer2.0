@@ -27,7 +27,7 @@ def test_epoch(model, valid_set, device):
         inputs = pics.cuda(device)
         pred = model(inputs)
         pred = torch.argmax(pred.mean(dim=0))
-        list.extend(pred.cpu().item())
+        list.append(pred.cpu().item())
     return list
 
 
