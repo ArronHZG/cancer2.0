@@ -87,6 +87,7 @@ if __name__ == '__main__':
         for idx in range(vd.count()["id"]):
             pics, label = valid_set[idx]
             print(pics.__len__())
+            print(pics[0].size())
             print(label)
             pics = torch.stack(pics)
             labels = torch.Tensor([label]*pics.size()[0])
