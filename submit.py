@@ -16,13 +16,12 @@ BATCH_SIZE = 80
 NUM_WORKERS = 8
 
 
-def test_epoch(model, data_loaders, device):
+def test_epoch(model, valid_set, device):
     # 加载到GPU
     model.cuda(device)
     model.eval()
-    valid_len = vd.count()["id"]
     list = []
-    for idx in tqdm(range(valid_len)):
+    for idx in tqdm(range(len(valid_set))):
         pics, _ = valid_set[idx]
         pics = torch.stack(pics)
         inputs = pics.cuda(device)
