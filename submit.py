@@ -78,29 +78,28 @@ if __name__ == '__main__':
         train_path = INPUT_PATH + '/train/'
         _, vd = train_test_split(data, test_size=0.1, random_state=123)
         valid_set = TTA_data_set(vd, train_path, tta_times=9)
+        valid_len = vd.count()["id"]
 
         # 损失函数
         criterion = torch.nn.CrossEntropyLoss().cuda(device)
         model.eval()
-        for idx in range(vd.count()["id"]):
+        valid_loss = 0
+        valid_acc = 0
+        for idx in tqdm(range(valid_len)):
             pics, label = valid_set[idx]
-            print(pics.__len__())
-            print(pics[0].size())
-            print(label)
             pics = torch.stack(pics)
             labels = torch.Tensor([label]*pics.size()[0])
+            inputs = pics.cuda(device)
+            labels = labels.cuda(device)
+            pred = model(inputs)
 
+            valid_loss += criterion(pred, labels)
 
-            print(pics.size())
-            print(labels.size())
+            pred = torch.argmax(pred, 1)
+            correct = pred.size(0) - (pred ^ label).sum().item()
+            sample = pred.size(0)
+            valid_acc += correct / sample
+        valid_loss /= valid_len
+        valid_acc/=valid_len
+        print(f"valid_loss: {valid_loss},valid_acc: {valid_acc}")
 
-            # inputs = pics.cuda(device)
-            # labels = labels.cuda(device)
-            # pred = model(inputs)
-            # c_loss = criterion(pred, labels)
-
-            #
-            #
-            #
-            # print(f"valid_loss: {valid_loss},valid_acc: {valid_acc}")
-            break
