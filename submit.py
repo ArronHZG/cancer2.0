@@ -91,7 +91,7 @@ if __name__ == '__main__':
         for idx in tqdm(range(valid_len)):
             pics, label = valid_set[idx]
             pics = torch.stack(pics)
-            labels = torch.Tensor([label] * pics.size()[0])
+            labels = torch.Tensor([label] * pics.size()[0], dtype=torch.float)
             inputs = pics.cuda(device)
             labels = labels.cuda(device)
             pred = model(inputs)
