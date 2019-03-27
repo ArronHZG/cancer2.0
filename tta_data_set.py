@@ -48,18 +48,20 @@ class TTA_data_set(Dataset):
             image = torch.from_numpy(image)
             image = image.permute(2, 0, 1)
             images_torch.append(image)
-        return images, label
+        return images_torch, label
 
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     import torchvision
-    import numpy as np
+    # import numpy as np
 
-    path = "../input/train/test_img.tif"
+    path = "./input/train/test_img.tif"
     images = readImage(path,80)
     print(len(images))
     images = [torch.from_numpy(image).permute(2, 0, 1) for image in images]
     grid_img = torchvision.utils.make_grid(images, nrow=9, pad_value=2)
     plt.imshow(grid_img.permute(1, 2, 0))
     plt.show()
+
+

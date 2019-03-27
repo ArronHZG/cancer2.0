@@ -4,14 +4,12 @@ from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 from PCam_data_set import PCam_data_set
 from load_paramter import load_parameter
-from models.densenet import densenet201
 import pandas as pd
 import torch
 
-from models.pnasnet import pnasnet5large
 from models.resnet import resnet18
-from trainer import START_TIME, valid_epoch
-from tta.tta_data_set import TTA_data_set
+from trainer import START_TIME
+from tta_data_set import TTA_data_set
 
 BATCH_SIZE = 80
 NUM_WORKERS = 8
