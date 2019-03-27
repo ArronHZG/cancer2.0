@@ -18,7 +18,7 @@ from collections import OrderedDict
 
 START_TIME = time.strftime("%Y-%m-%d--%H:%M:%S", time.localtime())
 
-writer = SummaryWriter(f'./logs/tensorBoardX/{START_TIME}')
+writer = SummaryWriter(os.path.join('logs','tensorBoardX',START_TIME))
 
 
 class Acc:

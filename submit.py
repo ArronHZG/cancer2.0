@@ -18,12 +18,12 @@ NUM_WORKERS = 8
 
 
 def test_epoch(model, data_loaders, device):
-    list=[]
+    list = []
     model.eval()
     for inputs, labels in tqdm(data_loaders):
         inputs = inputs.cuda(device)
         pred = model(inputs)
-        pred = torch.argmax(pred,1)
+        pred = torch.argmax(pred, 1)
         list.extend(pred.cpu().numpy().tolist())
     return list
 
@@ -34,7 +34,7 @@ def submit(model, model_name, device, test_path, csv_path):
     valid_loader = torch.utils.data.DataLoader(valid_set, batch_size=BATCH_SIZE,
                                                shuffle=False, num_workers=NUM_WORKERS)
     np_list = test_epoch(model, valid_loader, device)
-    sample_df["label"]=np_list
+    sample_df["label"] = np_list
     if not os.path.exists("submit"):
         os.makedirs("submit")
     sample_df.to_csv(f"submit/{START_TIME}--{model_name}_submit.csv", index=False)
@@ -62,9 +62,6 @@ if __name__ == '__main__':
     # model.cuda(device)
     # submit(model, model_name, device, test_path, test_csv_url)
 
-
-
-
     test = True
     if test:
         # 加载模型
@@ -82,25 +79,29 @@ if __name__ == '__main__':
         data = pd.read_csv(train_csv_url)
         train_path = INPUT_PATH + '/train/'
         _, vd = train_test_split(data, test_size=0.1, random_state=123)
-        valid_set = TTA_data_set(vd, train_path, tta_times= 9)
+        valid_set = TTA_data_set(vd, train_path, tta_times=9)
 
         # 损失函数
         criterion = torch.nn.CrossEntropyLoss().cuda(device)
         model.eval()
         for idx in range(vd.count()["id"]):
-            pics, labels=valid_set[idx]
+            pics, label = valid_set[idx]
             print(pics.__len__())
-            print(labels.__len__())
+            print(label)
+            pics = torch.stack(pics)
+            labels = torch.Tensor([label]*pics.size()[0])
 
 
-            i = 0
-            inputs = pics.cuda(device)
-            labels = labels.cuda(device)
-            pred = model(inputs)
-            c_loss = criterion(pred, labels)
+            print(pics.size())
+            print(labels.size())
+
+            # inputs = pics.cuda(device)
+            # labels = labels.cuda(device)
+            # pred = model(inputs)
+            # c_loss = criterion(pred, labels)
 
             #
-        #
-        #
-        # print(f"valid_loss: {valid_loss},valid_acc: {valid_acc}")
+            #
+            #
+            # print(f"valid_loss: {valid_loss},valid_acc: {valid_acc}")
             break

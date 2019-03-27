@@ -30,7 +30,7 @@ def readImage(path,times):
 
 class TTA_data_set(Dataset):
 
-    def __init__(self, csv_df, root_dir, tta_times):
+    def __init__(self, csv_ddf, root_dir, tta_times):
         self._df = csv_df
         self._root_dir = root_dir
         self.tta_times = tta_times
@@ -40,7 +40,7 @@ class TTA_data_set(Dataset):
 
     def __getitem__(self, idx):
         images = readImage(os.path.join(self._root_dir, self._df.iloc[idx, 0] + '.tif'),self.tta_times)
-        labels = [self._df.iloc[idx, 1] for _ in range(self.tta_times+1)]
+        label = self._df.iloc[idx, 1]
         images_torch = []
         for image in images:
             image = A.Normalize(mean=(0.70244707, 0.54624322, 0.69645334),
@@ -48,7 +48,7 @@ class TTA_data_set(Dataset):
             image = torch.from_numpy(image)
             image = image.permute(2, 0, 1)
             images_torch.append(image)
-        return images, labels
+        return images, label
 
 
 if __name__ == '__main__':
