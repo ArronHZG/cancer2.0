@@ -96,7 +96,7 @@ if __name__ == '__main__':
             labels = labels.cuda(device)
             pred = model(inputs)
 
-            valid_loss += criterion(pred, labels)
+            valid_loss += criterion(pred, labels).item()
 
             pred = torch.argmax(pred, 1)
             correct = pred.size(0) - (pred ^ label).sum().item()
