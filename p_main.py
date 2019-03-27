@@ -16,6 +16,7 @@ from load_paramter import load_parameter
 from models.pnasnet import pnasnet5large
 from trainer import train_model, logs_toCSV
 from my_lr_scheduler.gradualWarmupScheduler import GradualWarmupScheduler
+from torch.utils.data import DataLoader
 
 BATCH_SIZE = 80
 NUM_WORKERS = 8
@@ -31,9 +32,9 @@ test_size = 0.1
 tr, vd = train_test_split(data, test_size=test_size, random_state=123)
 train_set = PCam_data_set(tr, train_path, 'train')
 valid_set = PCam_data_set(vd, train_path, 'valid')
-train_loader = torch.utils.data.DataLoader(train_set, batch_size=BATCH_SIZE,
+train_loader = DataLoader(train_set, batch_size=BATCH_SIZE,
                                            shuffle=True, num_workers=NUM_WORKERS)
-valid_loader = torch.utils.data.DataLoader(valid_set, batch_size=BATCH_SIZE,
+valid_loader = DataLoader(valid_set, batch_size=BATCH_SIZE,
                                            shuffle=False, num_workers=NUM_WORKERS)
 dataloaders = {'train': train_loader, 'valid': valid_loader}
 # 加载模型

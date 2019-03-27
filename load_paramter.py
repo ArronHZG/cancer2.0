@@ -1,18 +1,16 @@
 import glob
 import torch
 from collections import OrderedDict
-
 from models.pnasnet import pnasnet5large
 from trainer import START_TIME
 
 def load_parameter(model, model_name, type=None, pre_model = None):
 
     if not type:
-        print("未选择模式，kaiming_uniform 初始化参数")
+        print("未选择模式, kaiming_uniform 初始化参数")
         model_dict = model.state_dict()
         parameter_dict = OrderedDict()
         for k, v in model_dict.items():
-            # print(k,"\t\t\t\t\t\t\t\t", v.size())
             if len(v.size())>1:
                 parameter_dict[k]=torch.nn.init.kaiming_uniform_(v)
         model_dict.update(parameter_dict)
@@ -46,7 +44,6 @@ def load_parameter(model, model_name, type=None, pre_model = None):
             # 找到最大的acc权重
             dic = OrderedDict({path.split("--")[-1].split(".")[-2]: path for path in path_list})
             keys = sorted(dic.keys())
-            # print(keys)
             # 得到对应路径
             path = dic[keys[-1]]
             print(f"load: {path}")

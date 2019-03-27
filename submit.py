@@ -8,10 +8,12 @@ from models.densenet import densenet201
 import pandas as pd
 import torch
 
+from models.pnasnet import pnasnet5large
 from models.resnet import resnet18
 from trainer import START_TIME, valid_epoch
+from tta.tta_data_set import TTA_data_set
 
-BATCH_SIZE = 128
+BATCH_SIZE = 80
 NUM_WORKERS = 8
 
 
@@ -45,32 +47,60 @@ if __name__ == '__main__':
     test_csv_url = INPUT_PATH + '/sample_submission.csv'
     device = 0
 
-    # 加载模型
-    model = densenet201(num_classes=2, pretrained=False)
-    model_name = 'densenet201'
-    # 模型参数加载
-    model = load_parameter(model,
-                           model_name,
-                           type='pre_model',
-                           pre_model='models_weight/MyWeight/' +
-                                      '2019-03-22--19:50:11/' +
-                                      '2019-03-22--21:08:38--densenet201--11--Loss--0.0880--Acc--0.9697.pth')
+    # # 加载模型
+    # model = pnasnet5large(num_classes=2, pretrained=False)
+    # model_name = 'pnasnet5large'
+    # # 模型参数加载
+    # model = load_parameter(model,
+    #                        model_name,
+    #                        type='pre_model',
+    #                        pre_model='models_weight/MyWeight/' +
+    #                                   '2019-03-24--15:32:27/' +
+    #                                   '2019-03-27--03:40:56--pnasnet5large--184--Loss--0.0680--Acc--0.9847.pth')
+    #
+    # # 加载到GPU
+    # model.cuda(device)
+    # submit(model, model_name, device, test_path, test_csv_url)
 
-    # 加载到GPU
-    model.cuda(device)
-    submit(model, model_name, device, test_path, test_csv_url)
-    # train_csv_url = INPUT_PATH + '/train_labels.csv'
-    # data = pd.read_csv(train_csv_url)
-    # train_path = INPUT_PATH + '/train/'
-    # tr, vd = train_test_split(data, test_size=0.1, random_state=123)
-    # train_set = PCam_data_set(tr, train_path, 'train')
-    # valid_set = PCam_data_set(vd, train_path, 'valid')
-    # train_loader = torch.utils.data.DataLoader(train_set, batch_size=BATCH_SIZE,
-    #                                            shuffle=True, num_workers=NUM_WORKERS)
-    # valid_loader = torch.utils.data.DataLoader(valid_set, batch_size=BATCH_SIZE,
-    #                                            shuffle=False, num_workers=NUM_WORKERS)
-    # dataloaders = {'train': train_loader, 'valid': valid_loader}
-    # # 损失函数
-    # criterion = torch.nn.CrossEntropyLoss().cuda(device)
-    # valid_acc, valid_loss = valid_epoch(model, dataloaders, device, criterion, model_name, 1, 0, 10)
-    # print(valid_acc,valid_loss)
+
+
+
+    test = True
+    if test:
+        # 加载模型
+        model = resnet18(num_classes=2, pretrained=False)
+        model_name = 'resnet18'
+        # 模型参数加载
+        model = load_parameter(model,
+                               model_name,
+                               type='pre_model',
+                               pre_model='models_weight/MyWeight/' +
+                                         '2019-03-17--14:34:45/' +
+                                         '2019-03-17--17:38:43--resnet18--46--Loss--0.0699--Acc--0.9767.pth')
+
+        train_csv_url = INPUT_PATH + '/train_labels.csv'
+        data = pd.read_csv(train_csv_url)
+        train_path = INPUT_PATH + '/train/'
+        _, vd = train_test_split(data, test_size=0.1, random_state=123)
+        valid_set = TTA_data_set(vd, train_path, tta_times= 9)
+
+        # 损失函数
+        criterion = torch.nn.CrossEntropyLoss().cuda(device)
+        model.eval()
+        for idx in range(vd.count()["id"]):
+            pics, labels=valid_set[idx]
+            print(pics.__len__())
+            print(labels.__len__())
+
+
+            i = 0
+            inputs = pics.cuda(device)
+            labels = labels.cuda(device)
+            pred = model(inputs)
+            c_loss = criterion(pred, labels)
+
+            #
+        #
+        #
+        # print(f"valid_loss: {valid_loss},valid_acc: {valid_acc}")
+            break
