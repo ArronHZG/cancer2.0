@@ -23,7 +23,7 @@ def load_parameter(model, model_name, type=None, pre_model = None):
             parameter_dict = {k: v for k, v in torch.load(pre_model).items() if k in model_dict}
             model_dict.update(parameter_dict)
             model.load_state_dict(model_dict)
-            print("加载model预训练模型")
+            print(f"加载{pre_model}预训练模型")
         else:
             print("没有model预训练模型")
 

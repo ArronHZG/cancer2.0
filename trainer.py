@@ -132,14 +132,13 @@ def valid_epoch(model, data_loaders, device, criterion, model_name, epoch, best_
     epoch_loss = loss.get()
     epoch_acc = acc.get()
     if epoch_acc > best_acc:
-        best_model_wts = copy.deepcopy(model.state_dict())
         local_path = "models_weight/MyWeight/" + START_TIME
         if not os.path.exists(local_path):
             os.makedirs(local_path)
         file_name = '{}--{}--{}--Loss--{:.4f}--Acc--{:.4f}.pth' \
             .format(time.strftime("%Y-%m-%d--%H:%M:%S", time.localtime()),
                     model_name, epoch, epoch_loss, epoch_acc)
-        torch.save(best_model_wts, os.path.join(local_path, file_name))
+        torch.save(copy.deepcopy(model.state_dict()), os.path.join(local_path, file_name))
         print(f"save: {os.path.join(local_path, file_name)}")
     return epoch_acc, epoch_loss
 
