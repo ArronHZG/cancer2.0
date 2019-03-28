@@ -112,8 +112,8 @@ if __name__ == '__main__':
 
             pred = model(inputs)
             print(labels)
-            print(pred)pred
-            valid_loss += critn(pred, labels).item()
+            print(pred)
+            valid_loss += criterion(pred, labels).item()
             pred = torch.argmax(pred, 1)
             correct = pred.size(0) - (pred ^ label).sum().item()
             sample = pred.size(0)
