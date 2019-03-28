@@ -107,12 +107,19 @@ if __name__ == '__main__':
             labels = torch.FloatTensor([label] * pics.size()[0]).long()
             inputs = pics.cuda(device)
             labels = labels.cuda(device)
+
+
+
             pred = model(inputs)
-            valid_loss += criterion(pred, labels).item()
+            print(labels)
+            print(pred)pred
+            valid_loss += critn(pred, labels).item()
             pred = torch.argmax(pred, 1)
             correct = pred.size(0) - (pred ^ label).sum().item()
             sample = pred.size(0)
             valid_acc += correct / sample
+
+            break
         valid_loss /= valid_len
         valid_acc /= valid_len
         print(f"valid_loss: {valid_loss},valid_acc: {valid_acc}")
